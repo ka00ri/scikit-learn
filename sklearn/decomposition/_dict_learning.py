@@ -19,6 +19,7 @@ from ..base import BaseEstimator, TransformerMixin, ClassNamePrefixFeaturesOutMi
 from ..utils import check_array, check_random_state, gen_even_slices, gen_batches
 from ..utils import deprecated
 from ..utils._param_validation import Hidden, Interval, StrOptions
+from ..utils._param_validation import validate_params
 from ..utils.extmath import randomized_svd, row_norms, svd_flip
 from ..utils.validation import check_is_fitted
 from ..utils.fixes import delayed
@@ -220,7 +221,24 @@ def _sparse_encode(
         return new_code.reshape(n_samples, n_components)
     return new_code
 
-
+@validate_params(
+    {
+        "X": ["array-like"],
+        "dictionary": ["array-like"],
+        "gram": ["array-like", None],
+        "cov": ["array-like", None],
+        "algorithm": [StrOptions({"lasso_lars", "lasso_cd", "lars", "omp", "threshold"})],
+        "n_nonzero_coefs": [Interval(Integral, 1, None, closed="left"), None],
+        "alpha": [Interval(Real, 0, None, closed="left"), None],
+        "copy_cov": ["boolean"],
+        "init": ["array-like", None],
+        "max_iter": [Interval(Integral, 1, None, closed="left")],
+        "n_jobs": [Interval(Integral, -1, None, closed="left"), None],
+        "check_input": ["boolean"],
+        "verbose": ["verbose"],
+        "positive": ["boolean"],
+    }
+)
 # XXX : could be moved to the linear_model module
 def sparse_encode(
     X,
